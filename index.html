@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="bn">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Spondicta 💖</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Canvas Confetti CDN for Celebration Effect -->
+    <script src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.6.0/dist/confetti.browser.min.js"></script>
+    <!-- Google Bengali Font (Hind Siliguri) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Hind+Siliguri:wght@400;600;700&display=swap" rel="stylesheet">
+    
+    <style>
+        body {
+            font-family: 'Hind Siliguri', sans-serif;
+        }
+        #noBtn {
+            transition: all 0.2s ease-out;
+        }
+        .custom-scrollbar::-webkit-scrollbar {
+            width: 8px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-track {
+            background: rgba(0, 0, 0, 0.2);
+            border-radius: 10px;
+        }
+        .custom-scrollbar::-webkit-scrollbar-thumb {
+            background-color: rgba(255, 255, 255, 0.5);
+            border-radius: 10px;
+        }
+        /* ঝরে পড়া পাপড়ি ও ইমোজির অ্যানিমেশন */
+        .falling-item {
+            position: fixed;
+            top: -10%;
+            z-index: 50;
+            user-select: none;
+            pointer-events: none;
+            animation: fall linear infinite;
+        }
+        @keyframes fall {
+            0% {
+                transform: translateY(0) rotate(0deg);
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(105vh) rotate(360deg);
+                opacity: 0.2;
+            }
+        }
+    </style>
+</head>
+<body class="bg-gradient-to-br from-slate-900 via-purple-950 to-rose-950 min-h-screen flex items-center justify-center text-white p-4 relative overflow-y-auto">
+
+    <!-- ব্যাকগ্রাউন্ডে ঝরে পড়া ইমোজি কন্টেইনার -->
+    <div id="fallingContainer"></div>
+
+    <!-- ব্যাকগ্রাউন্ড মিউজিক -->
+    <audio id="bgMusic" loop>
+        <source src="music.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- ধাপ ১: ল্যান্ডিং সেকশন -->
+    <div id="page1" class="text-center px-4 max-w-lg w-full transition-all duration-500 z-10 my-auto">
+        <h1 class="text-4xl md:text-6xl font-bold mb-4 drop-shadow-lg text-pink-300">
+            প্রিয় স্পন্দিতা... ✨
+        </h1>
+        <p class="text-lg md:text-xl text-pink-100 mb-8 font-medium">
+            তোমার জন্য একটি বিশেষ বার্তা ও অনুভূতি অপেক্ষা করছে!
+        </p>
+        <button onclick="startExperience()" class="bg-pink-500 hover:bg-pink-600 text-white font-bold text-lg px-8 py-3 rounded-full shadow-xl transition duration-300 transform hover:scale-105 border border-pink-300">
+            শুরু করা যাক 💌
+        </button>
+    </div>
+
+    <!-- ধাপ ২: চিঠি ও ছবি গ্যালারি সেকশন -->
+    <div id="page2" class="hidden max-w-2xl w-full text-center px-2 transition-all duration-500 z-10 my-auto">
+        <h2 class="text-3xl md:text-4xl font-bold mb-4 text-pink-300 drop-shadow-md">আমার হৃদয়ের বার্তা ✨</h2>
+        
+        <!-- ডার্ক স্পষ্ট টাইপিং চিঠি বক্স -->
+        <div class="bg-black/60 backdrop-blur-md p-6 rounded-2xl shadow-2xl mb-6 text-left border border-pink-500/30 max-h-[50vh] overflow-y-auto custom-scrollbar leading-relaxed text-white">
+            <p id="typedLetter" class="whitespace-pre-line text-lg md:text-xl font-normal border-r-2 border-pink-400 pr-1 animate-pulse min-h-[200px] text-gray-100">
+                <!-- লাইভ টেক্সট এখানে টাইপ হবে -->
+            </p>
+        </div>
+
+        <!-- ছবি গ্যালারি সেকশন -->
+        <div class="mb-6">
+            <h3 class="text-xl font-semibold mb-3 text-pink-200">আমাদের সুন্দর কিছু স্মৃতি 📸</h3>
+            <div class="grid grid-cols-2 md:grid-cols-3 gap-3">
+                <img src="image1.jpg" alt="Memory 1" class="rounded-xl shadow-md border-2 border-pink-400/50 h-32 w-full object-cover">
+                <img src="image2.jpg" alt="Memory 2" class="rounded-xl shadow-md border-2 border-pink-400/50 h-32 w-full object-cover">
+                <img src="image3.jpg" alt="Memory 3" class="rounded-xl shadow-md border-2 border-pink-400/50 h-32 w-full object-cover col-span-2 md:col-span-1">
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center pt-2">
+            <button onclick="goToPage(1)" class="bg-white/10 text-white font-semibold px-6 py-2 rounded-full hover:bg-white/20 border border-white/20 transition">
+                ⬅️ পেছনে
+            </button>
+            <button onclick="goToPage(3)" class="bg-pink-500 hover:bg-pink-600 text-white font-bold px-7 py-2.5 rounded-full shadow-lg transition">
+                পরবর্তী ধাপ ➡️
+            </button>
+        </div>
+    </div>
+
+    <!-- ধাপ ৩: মূল প্রপোজাল সেকশন -->
+    <div id="page3" class="hidden text-center px-4 transition-all duration-500 max-w-xl w-full z-10 my-auto py-6">
+        <h2 class="text-3xl md:text-5xl font-extrabold mb-4 text-pink-300 drop-shadow-md">
+            Will You Be Mine Forever? 💍💖
+        </h2>
+        <p class="text-xl text-pink-100 mb-8 font-medium">
+            স্পন্দিতা, তুমি কি আমার সারাজীবনের সাথী হবে?
+        </p>
+
+        <!-- বাটনসমূহ -->
+        <div class="flex justify-center items-center gap-6 relative h-20 mb-4">
+            <!-- Yes Button -->
+            <button onclick="sayYes()" class="bg-green-500 hover:bg-green-600 text-white font-bold text-xl px-8 py-3 rounded-full shadow-2xl hover:scale-110 transition duration-300 border border-green-300">
+                Yes! 💖
+            </button>
+
+            <!-- No Button -->
+            <button id="noBtn" onmouseover="moveButton()" onclick="moveButton()" class="bg-red-500 text-white font-bold text-xl px-8 py-3 rounded-full shadow-2xl absolute border border-red-300">
+                No 😜
+            </button>
+        </div>
+
+        <!-- Yes ক্লিক করার পর সারপ্রাইজ প্যানেল -->
+        <div id="successMsg" class="hidden space-y-4">
+            <!-- ১. সুইট লাভ বার্তা -->
+            <div class="bg-black/60 backdrop-blur-lg p-6 rounded-2xl border border-pink-500/40 animate-bounce shadow-xl">
+                <h3 class="text-3xl font-bold text-yellow-300 mb-2">I Love You! 🥰❤️</h3>
+                <p class="text-lg text-white">তুমি 'Yes' বলেছ! জীবনের প্রতিটি মুহূর্তে তোমাকে আমার পাশে চাই, স্পন্দিতা। 🌹✨</p>
+            </div>
+
+            <!-- ২. রিলেশনশিপ কাউন্টার (Day 1 of Forever) -->
+            <div class="bg-black/60 backdrop-blur-lg p-4 rounded-2xl border border-pink-500/30 text-center">
+                <h4 class="text-xl font-bold text-yellow-400 mb-1">Day 1 of Forever ♾️</h4>
+                <p id="timer" class="text-lg text-pink-200 font-mono font-semibold">Days: 00 | Hours: 00 | Minutes: 00 | Seconds: 00</p>
+                <span class="text-xs text-gray-300">Relationship Counter</span>
+            </div>
+
+            <!-- ৩. সোশ্যাল বাটন (মেসেঞ্জার / হোয়াটসঅ্যাপ) -->
+            <div class="flex flex-col sm:flex-row justify-center gap-3">
+                <a href="https://m.me/61595387666336" target="_blank" class="bg-blue-600 hover:bg-blue-700 text-white font-semibold px-5 py-2.5 rounded-full shadow-lg transition flex items-center justify-center gap-2">
+                    💬 মেসেঞ্জারে জানাচ্ছ 📲
+                </a>
+                <a href="https://wa.me/8801314809122?text=I%20said%20YES!%20💖" target="_blank" class="bg-emerald-600 hover:bg-emerald-700 text-white font-semibold px-5 py-2.5 rounded-full shadow-lg transition flex items-center justify-center gap-2">
+                    🟢 হোয়াটসঅ্যাপে জানাচ্ছ 📲
+                </a>
+            </div>
+
+            <!-- ৪. ভয়েস বার্তা -->
+            <div class="bg-black/60 backdrop-blur-lg p-4 rounded-2xl border border-pink-500/30 text-left">
+                <p class="text-sm text-pink-300 font-semibold mb-2 text-center">স্পেশাল ভয়েস মেসেজ 🎵</p>
+                <audio controls class="w-full h-10 rounded-lg">
+                    <source src="voice.mp3" type="audio/mpeg">
+                    Your browser does not support the audio element.
+                </audio>
+            </div>
+
+            <!-- নতুন স্পেশাল পেজে যাওয়ার বাটন -->
+            <div class="pt-4">
+                <button onclick="goToPage(4)" class="bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-bold text-lg px-8 py-3 rounded-full shadow-2xl transition transform hover:scale-105 border border-pink-300/50">
+                    আমাদের স্পেশাল ফিচারস দেখুন ✨➡️
+                </button>
+            </div>
+        </div>
+
+        <div class="mt-6">
+            <button onclick="goToPage(2)" class="text-sm underline text-pink-200 hover:text-white">
+                ⬅️ পেছনে যান
+            </button>
+        </div>
+    </div>
+
+    <!-- ধাপ ৪: আলটিমেট ফিচারস পেজ (Bucket List, Timeline, Coupons, Secret Message) -->
+    <div id="page4" class="hidden max-w-3xl w-full text-center px-3 transition-all duration-500 z-10 my-auto py-6">
+        <h2 class="text-3xl md:text-5xl font-extrabold mb-6 text-pink-300 drop-shadow-md">
+            আমাদের ভালোবাসার ক্যানভাস 💖✨
+        </h2>
+
+        <div class="space-y-6 text-left">
+            <!-- ১. Memory Timeline -->
+            <div class="bg-black/60 backdrop-blur-lg p-5 rounded-2xl border border-pink-500/30 shadow-xl">
+                <h3 class="text-xl font-bold text-yellow-300 mb-4 flex items-center gap-2">
+                    <span>🗓️</span> আমাদের সুন্দর মুহূর্তগুলো (Memory Timeline)
+                </h3>
+                <div class="space-y-3 pl-2 border-l-2 border-pink-500/50">
+                    <div class="relative pl-4">
+                        <div class="absolute -left-[9px] top-1.5 w-3 h-3 bg-pink-500 rounded-full"></div>
+                        <p class="text-xs text-pink-300 font-semibold">প্রথম অনুভূতি</p>
+                        <p class="text-sm md:text-base text-gray-200">তোমার সাথে প্রথম কথা বলার দিনটি আমার জীবনের অন্যতম সেরা দিন।</p>
+                    </div>
+                    <div class="relative pl-4">
+                        <div class="absolute -left-[9px] top-1.5 w-3 h-3 bg-pink-500 rounded-full"></div>
+                        <p class="text-xs text-pink-300 font-semibold">প্রথম দেখার স্মৃতি</p>
+                        <p class="text-sm md:text-base text-gray-200">তোমার ওই মিষ্টি হাসি দেখে আমার মনটা থমকে গিয়েছিল।</p>
+                    </div>
+                    <div class="relative pl-4">
+                        <div class="absolute -left-[9px] top-1.5 w-3 h-3 bg-pink-500 rounded-full"></div>
+                        <p class="text-xs text-pink-300 font-semibold">আজকের এই দিন</p>
+                        <p class="text-sm md:text-base text-gray-200">তুমি আমার ভালোবাসার প্রস্তাব গ্রহণ করে আমাকে ধন্য করলে! ❤️</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ২. Our Bucket List -->
+            <div class="bg-black/60 backdrop-blur-lg p-5 rounded-2xl border border-pink-500/30 shadow-xl">
+                <h3 class="text-xl font-bold text-yellow-300 mb-3 flex items-center gap-2">
+                    <span>📜</span> আমাদের ভালোবাসার বাকেট লিস্ট (Bucket List)
+                </h3>
+                <p class="text-xs text-gray-300 mb-3">যে স্বপ্নগুলো আমরা দুজনে মিলে পূরণ করব:</p>
+                <div class="space-y-2 text-sm md:text-base text-gray-200">
+                    <label class="flex items-center gap-3 cursor-pointer bg-white/5 p-2 rounded-lg hover:bg-white/10 transition">
+                        <input type="checkbox" class="w-4 h-4 accent-pink-500 rounded">
+                        <span>🏔️ একসাথে কোনো পাহাড়ে উঠে সূর্যাস্ত দেখা</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer bg-white/5 p-2 rounded-lg hover:bg-white/10 transition">
+                        <input type="checkbox" class="w-4 h-4 accent-pink-500 rounded">
+                        <span>🌧️ এক ছাতার নিচে বৃষ্টিতে হাঁটা</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer bg-white/5 p-2 rounded-lg hover:bg-white/10 transition">
+                        <input type="checkbox" class="w-4 h-4 accent-pink-500 rounded">
+                        <span>☕ নিস্তব্ধ রাতে কফির কাপ হাতে দীর্ঘ গল্প করা</span>
+                    </label>
+                    <label class="flex items-center gap-3 cursor-pointer bg-white/5 p-2 rounded-lg hover:bg-white/10 transition">
+                        <input type="checkbox" class="w-4 h-4 accent-pink-500 rounded">
+                        <span>✈️ দুজনে মিলে নতুন কোনো সুন্দর জায়গায় ঘুরে আসা</span>
+                    </label>
+                </div>
+            </div>
+
+            <!-- ৩. Virtual Love Coupons -->
+            <div class="bg-black/60 backdrop-blur-lg p-5 rounded-2xl border border-pink-500/30 shadow-xl">
+                <h3 class="text-xl font-bold text-yellow-300 mb-3 flex items-center gap-2">
+                    <span>🎟️</span> স্পেশাল লাভ কুপন (Love Coupons)
+                </h3>
+                <p class="text-xs text-gray-300 mb-3">স্পন্দিতা, এই কুপনগুলো তুমি আমার কাছে যেকোনো সময় রিডিম করতে পারবে:</p>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-3 text-center">
+                    <div class="bg-gradient-to-br from-pink-600/40 to-purple-600/40 p-3 rounded-xl border border-pink-400/40">
+                        <p class="text-2xl mb-1">🤗</p>
+                        <p class="font-bold text-sm text-pink-200">১টি ফ্রি ওয়ার্ম হাগ</p>
+                        <p class="text-[10px] text-gray-300 mt-1">যেকোনো সময় দাবি করা যাবে</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-pink-600/40 to-purple-600/40 p-3 rounded-xl border border-pink-400/40">
+                        <p class="text-2xl mb-1">🍦</p>
+                        <p class="font-bold text-sm text-pink-200">আইসক্রিম ট্রিট</p>
+                        <p class="text-[10px] text-gray-300 mt-1">তোমার পছন্দের যেকোনো ব্র্যান্ড</p>
+                    </div>
+                    <div class="bg-gradient-to-br from-pink-600/40 to-purple-600/40 p-3 rounded-xl border border-pink-400/40">
+                        <p class="text-2xl mb-1">👑</p>
+                        <p class="font-bold text-sm text-pink-200">রাগ ভাঙানোর কুপন</p>
+                        <p class="text-[10px] text-gray-300 mt-1">আমি তৎক্ষণাৎ সরি বলব</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ৪. Secret Message Box -->
+            <div class="bg-black/60 backdrop-blur-lg p-5 rounded-2xl border border-pink-500/30 shadow-xl">
+                <h3 class="text-xl font-bold text-yellow-300 mb-2 flex items-center gap-2">
+                    <span>💌</span> তোমার মনের গোপন বার্তা
+                </h3>
+                <p class="text-xs text-gray-300 mb-3">ওয়েবসাইটটি দেখার পর তোমার মনের অনুভূতি নিচে লিখে আমাকে মেসেঞ্জারে পাঠাতে পারো:</p>
+                <textarea id="userSecretMsg" rows="3" placeholder="এখানে তোমার মনের কথা লেখো, স্পন্দিতা..." class="w-full bg-white/10 border border-pink-400/40 rounded-xl p-3 text-sm text-white placeholder-gray-400 focus:outline-none focus:border-pink-400 mb-3"></textarea>
+                <button onclick="sendSecretMsg()" class="w-full bg-gradient-to-r from-pink-500 to-rose-600 hover:from-pink-600 hover:to-rose-700 text-white font-bold py-2.5 rounded-xl shadow-lg transition">
+                    মেসেঞ্জারে বার্তাটি পাঠাও 📲
+                </button>
+            </div>
+        </div>
+
+        <div class="flex justify-between items-center pt-6">
+            <button onclick="goToPage(3)" class="bg-white/10 text-white font-semibold px-6 py-2 rounded-full hover:bg-white/20 border border-white/20 transition text-sm">
+                ⬅️ প্রপোজাল পেজে ফিরুন
+            </button>
+            <p class="text-xs text-pink-300">Made with ❤️ for Spondita</p>
+        </div>
+    </div>
+
+    <script>
+        const fullLetterText = `প্রিয় স্পন্দিতা,
+
+নিস্তব্ধ রাতের আকাশে যখন একলা চাঁদটা আলো ছড়ায়, আমার এই চাতক মন তখন কেবল তোমারই ভাবনায় ডুবে থাকে।
+
+আজ আর কোনো আড়াল নয়, কোনো লুকোচুরি নয়—আমার হৃদয়ের ক্যানভাসে আঁকা সবটুকু রঙ দিয়ে আজ তোমাকে আমার হৃদ স্পন্দন হিসেবে স্বীকার করতে চাই।
+
+তুমি হয়তো জানো না, তোমার ওই মায়াবী চোখের দিকে তাকালে আমি নিজের অস্তিত্ব হারিয়ে ফেলি। তোমার প্রতিটি কথা যেন কোনো এক চেনা সুরের মতো আমার কানে বাজে, আর তোমার ওই এক চিলতে মিষ্টি হাসি আমার বিষণ্ণ দিনের সব মেঘ এক নিমেষে উড়িয়ে দেয়।
+
+জীবনের এই দীর্ঘ পথচলায় আমি আর একাকী হাঁটতে চাই না। আমি চাই আমার জীবনের প্রতিটি সকাল শুরু হোক তোমার মুখ দেখে, আর প্রতিটি রূপালী রাত কেটে যাক তোমার হাতটি ধরে।
+
+তুমি কেবল আমার বর্তমান নও, আমার আগামীর প্রতিটি স্বপ্নের শেষ সীমানা। তোমার সুখের দিনে আমি হব তোমার ঠোঁটের কোণের হাসি, আর কষ্টের মেঘ জমলে আমি হব সেই ছাতা যা তোমাকে আগলে রাখবে।
+
+আমার জীবনের সবটুকু ভালোবাসা, সবটুকু যত্ন আর অধিকার উজাড় করে আমি তোমাকে আপন করে নিতে চাই। আমাদের এই গল্পে আমি কোনো অপূর্ণতা রাখতে চাই না।
+
+আমার জীবনের শ্রেষ্ঠ উপহার হয়ে তুমি কি আমার হাতটা সারাজীবনের জন্য ধরবে?
+
+কোনো তাড়া নেই, তোমার হৃদয়ের স্পন্দন যা বলে, তা শোনার জন্যই আমি অধীর আগ্রহে অপেক্ষা করছি।
+
+ইতি—
+তোমার ভালোবাসায় মগ্ন,
+তোমার স্পন্দন`;
+
+        let letterIndex = 0;
+        let isTypingStarted = false;
+        let timerInterval = null;
+
+        function typeWriter() {
+            if (letterIndex < fullLetterText.length) {
+                document.getElementById("typedLetter").textContent += fullLetterText.charAt(letterIndex);
+                letterIndex++;
+                
+                const letterBox = document.getElementById("typedLetter").parentElement;
+                letterBox.scrollTop = letterBox.scrollHeight;
+
+                setTimeout(typeWriter, 35);
+            }
+        }
+
+        function startExperience() {
+            var music = document.getElementById('bgMusic');
+            music.play().catch(function(error) {
+                console.log("Audio play blocked by browser:", error);
+            });
+            goToPage(2);
+        }
+
+        function goToPage(pageNum) {
+            document.getElementById('page1').classList.add('hidden');
+            document.getElementById('page2').classList.add('hidden');
+            document.getElementById('page3').classList.add('hidden');
+            document.getElementById('page4').classList.add('hidden');
+
+            document.getElementById('page' + pageNum).classList.remove('hidden');
+
+            if (pageNum === 2 && !isTypingStarted) {
+                isTypingStarted = true;
+                document.getElementById("typedLetter").textContent = "";
+                typeWriter();
+            }
+
+            // স্ক্রোলবারকে একদম উপরে নিয়ে যাবে নতুন পেজে গেলে
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        }
+
+        function moveButton() {
+            const noBtn = document.getElementById('noBtn');
+            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth - 100);
+            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight - 100);
+
+            noBtn.style.position = 'fixed';
+            noBtn.style.left = `${x}px`;
+            noBtn.style.top = `${y}px`;
+        }
+
+        // 'Yes' বাটন প্রেসের লজিক
+        function sayYes() {
+            document.getElementById('successMsg').classList.remove('hidden');
+            document.getElementById('noBtn').classList.add('hidden');
+
+            // ১. কনফেটি পার্টি অ্যানিমেশন
+            confetti({
+                particleCount: 120,
+                spread: 80,
+                origin: { y: 0.6 }
+            });
+
+            // ২. রিলেশনশিপ টাইমার গণনা শুরু
+            const startTime = new Date();
+            if(!timerInterval) {
+                timerInterval = setInterval(() => {
+                    const now = new Date();
+                    const diff = Math.floor((now - startTime) / 1000);
+
+                    const days = Math.floor(diff / (24 * 3600));
+                    const hours = Math.floor((diff % (24 * 3600)) / 3600);
+                    const minutes = Math.floor((diff % 3600) / 60);
+                    const seconds = diff % 60;
+
+                    document.getElementById('timer').innerText = 
+                        `Days: ${String(days).padStart(2, '0')} | Hours: ${String(hours).padStart(2, '0')} | Minutes: ${String(seconds).padStart(2, '0')} | Seconds: ${String(seconds).padStart(2, '0')}`;
+                }, 1000);
+            }
+        }
+
+        // গোপন বার্তা পাঠানোর ফাংশন
+        function sendSecretMsg() {
+            const msg = document.getElementById('userSecretMsg').value;
+            if(msg.trim() === "") {
+                alert("অনুগ্রহ করে কিছু লিখুন, স্পন্দিতা!");
+                return;
+            }
+            // আপনার ইউজারনেম দিয়ে পরিবর্তন করতে পারেন
+            const fbUsername = "your.username"; 
+            const encodedMsg = encodeURIComponent("আমার গোপন বার্তা: " + msg);
+            window.open(`https://m.me/${fbUsername}?text=${encodedMsg}`, '_blank');
+        }
+
+        function createFallingItem() {
+            const container = document.getElementById('fallingContainer');
+            const items = ['🌹', '🌸', '💖', '❤️', '✨', '💕'];
+            
+            const item = document.createElement('div');
+            item.classList.add('falling-item');
+            item.innerText = items[Math.floor(Math.random() * items.length)];
+            
+            item.style.left = Math.random() * 100 + 'vw';
+            item.style.animationDuration = (Math.random() * 3 + 4) + 's';
+            item.style.fontSize = (Math.random() * 12 + 18) + 'px';
+            
+            container.appendChild(item);
+
+            setTimeout(() => {
+                item.remove();
+            }, 7000);
+        }
+
+        setInterval(createFallingItem, 400);
+    </script>
+
+</body>
+</html>
